@@ -1,41 +1,25 @@
-# Leo Suite · CampusBot AI
-
-[mentorkokkwa](https://github.com/mentorkokkwa) · [YouthMentor](https://github.com/mentorkokkwa/leo-suite-growth) · [EduLens](https://github.com/mentorkokkwa/leo-suite-edutech) · [Suite docs](https://github.com/mentorkokkwa/leo-suite)
+# CampusBot AI
 
 School service robot navigation and task execution simulator.
 
+Part of the **Leo Suite** (YouthMentor · EduLens · CampusBot).
+
 ## Features
 
-- **School map simulator** — Staff room, classrooms, library, office, auditorium, gate, corridors, restricted zones, obstacles, moving students
-- **Task planner** — Worksheet delivery, visitor guide, library book return, document delivery
-- **Navigation engine** — Real A* path planning, obstacle detection, dynamic re-planning, safety rules
-- **Metrics & report** — Path length, time steps, collisions, re-plans, decision log, simulation report
+- School map simulator with A* path planning
+- Task planner: worksheet delivery, visitor guide, library return
+- Metrics, decision log, simulation report
 
-## Pages
-
-| Route | Description |
-|-------|-------------|
-| `/campusbot` | Product home |
-| `/campusbot/simulator` | Live robotics control dashboard |
-| `/campusbot/maps` | Map and location reference |
-| `/campusbot/tasks` | Task definitions |
-| `/campusbot/experiments` | Three demo scenarios |
-| `/campusbot/report` | Post-simulation report |
-
-## Demo scenarios
-
-1. **Worksheet delivery** — Staff room → Classroom 4A (dynamic student in corridor)
-2. **Visitor guide** — School gate → Auditorium (crowded path, restricted zone)
-3. **Library book return** — Counter → Shelf zone (narrow path, static obstacles)
-
-## Development
+## Quick start
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open [http://localhost:3002/campusbot](http://localhost:3002/campusbot).
+Open `/campusbot` on the dev server (default port **3002**).
+
+No API keys or environment variables required — fully client-side simulation.
 
 ## Build
 
@@ -43,11 +27,3 @@ Open [http://localhost:3002/campusbot](http://localhost:3002/campusbot).
 npm run build
 npm start
 ```
-
-## Future hardware (not implemented)
-
-- Arduino / Raspberry Pi motor control
-- Camera-based obstacle detection
-- ROS2 integration
-- Indoor localisation
-- Real robot teleoperation interface
