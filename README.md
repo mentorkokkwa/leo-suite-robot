@@ -1,7 +1,6 @@
-# CampusBot AI
+# Leo Suite · CampusBot AI
 
-**Leo Suite** · Liu Cenzhi · [mentorkokkwa](https://github.com/mentorkokkwa)  
-Repo: **leo-suite-robot** · Also: [YouthMentor](https://github.com/mentorkokkwa/leo-suite-growth) · [EduLens](https://github.com/mentorkokkwa/leo-suite-edutech) · [Suite docs](https://github.com/mentorkokkwa/leo-suite)
+[mentorkokkwa](https://github.com/mentorkokkwa) · [YouthMentor](https://github.com/mentorkokkwa/leo-suite-growth) · [EduLens](https://github.com/mentorkokkwa/leo-suite-edutech) · [Suite docs](https://github.com/mentorkokkwa/leo-suite)
 
 School service robot navigation and task execution simulator.
 
