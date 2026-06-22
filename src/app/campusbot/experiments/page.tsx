@@ -21,6 +21,26 @@ export default function ExperimentsPage() {
         </h1>
         <p className="mt-2 text-slate-400">{t("experiments.subtitle")}</p>
 
+        {/* Educator tips callout */}
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-lg border border-violet-800/60 bg-violet-950/30 p-4">
+            <p className="text-xs font-bold uppercase tracking-wider text-violet-400">
+              🎓 {t("experiments.teacherTip")}
+            </p>
+            <p className="mt-2 text-xs leading-relaxed text-slate-400">
+              {t("experiments.teacherTipDesc")}
+            </p>
+          </div>
+          <div className="rounded-lg border border-cyan-800/60 bg-cyan-950/30 p-4">
+            <p className="text-xs font-bold uppercase tracking-wider text-cyan-400">
+              📽 {t("experiments.teacherTip2")}
+            </p>
+            <p className="mt-2 text-xs leading-relaxed text-slate-400">
+              {t("experiments.teacherTip2Desc")}
+            </p>
+          </div>
+        </div>
+
         <ul className="mt-8 space-y-6">
           {DEMO_SCENARIOS.map((scenario) => {
             const task = getTaskById(scenario.taskId);
@@ -42,7 +62,7 @@ export default function ExperimentsPage() {
                   {t(`scenario.${scenario.id}.description`)}
                 </p>
                 <p className="mt-3 text-xs font-semibold uppercase text-amber-400">
-                  {t("experiments.challenge")}:{" "}
+                  ⚡ {t("experiments.challenge")}:{" "}
                   {t(`scenario.${scenario.id}.challenge`)}
                 </p>
                 {task && (
@@ -58,7 +78,7 @@ export default function ExperimentsPage() {
                 </p>
                 <Link
                   href={`/campusbot/simulator?scenario=${scenario.id}`}
-                  className="mt-4 inline-block rounded border border-cyan-700 px-3 py-1.5 text-xs font-semibold text-cyan-300 hover:bg-cyan-950"
+                  className="mt-4 inline-block rounded bg-cyan-700 px-4 py-1.5 text-xs font-bold text-white transition hover:bg-cyan-600"
                 >
                   {t("experiments.openInSimulator")}
                 </Link>

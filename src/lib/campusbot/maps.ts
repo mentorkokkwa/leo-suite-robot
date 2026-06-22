@@ -1,9 +1,13 @@
 import { buildMapFromLayout } from "./mapBuilder";
+import {
+  FUHUA_CAMPUS_PAD_X,
+  shiftPointX,
+} from "./fuhuaCampus";
 import type { CampusLocation, CampusMap } from "./types";
 import type { Locale } from "@/lib/i18n/types";
 import { locationName, t } from "@/lib/i18n";
 
-const SCHOOL_LAYOUT = [
+const INDOOR_LAYOUT = [
   "########################",
   "#SS..####....####..LL..#",
   "#SS...CC#...#CC#...LL..#",
@@ -29,7 +33,13 @@ const SCHOOL_LAYOUT = [
   "########################",
 ];
 
-const base = buildMapFromLayout("school-main", "school-main", SCHOOL_LAYOUT, {
+const EXTERIOR_PAD = "~".repeat(FUHUA_CAMPUS_PAD_X);
+
+const SCHOOL_LAYOUT = INDOOR_LAYOUT.map(
+  (row) => EXTERIOR_PAD + row + EXTERIOR_PAD
+);
+
+const INDOOR_CELL_OVERRIDES: Record<string, { labelId: string }> = {
   "2,1": { labelId: "staff-room" },
   "7,1": { labelId: "class-4a" },
   "15,1": { labelId: "class-4b" },
@@ -47,18 +57,37 @@ const base = buildMapFromLayout("school-main", "school-main", SCHOOL_LAYOUT, {
   "6,12": { labelId: "auditorium" },
   "7,12": { labelId: "auditorium" },
   "11,21": { labelId: "school-gate" },
-});
+};
+
+const cellOverrides = Object.fromEntries(
+  Object.entries(INDOOR_CELL_OVERRIDES).map(([key, value]) => {
+    const [x, y] = key.split(",").map(Number);
+    return [`${x + FUHUA_CAMPUS_PAD_X},${y}`, value];
+  })
+);
+
+const base = buildMapFromLayout("school-main", "school-main", SCHOOL_LAYOUT, cellOverrides);
+
+const INDOOR_LOCATIONS: Omit<CampusLocation, "name">[] = [
+  { id: "staff-room", x: 2, y: 2, type: "staff_room" },
+  { id: "classroom-4a", x: 7, y: 2, type: "classroom" },
+  { id: "classroom-4b", x: 15, y: 2, type: "classroom" },
+  { id: "library-counter", x: 20, y: 2, type: "library" },
+  { id: "library-shelf", x: 20, y: 6, type: "library" },
+  { id: "general-office", x: 15, y: 10, type: "office" },
+  { id: "auditorium", x: 7, y: 12, type: "auditorium" },
+  { id: "school-gate", x: 11, y: 21, type: "gate" },
+  { id: "corridor-mid", x: 11, y: 9, type: "corridor" },
+];
 
 const locations: CampusLocation[] = [
-  { id: "staff-room", name: "staff-room", x: 2, y: 2, type: "staff_room" },
-  { id: "classroom-4a", name: "classroom-4a", x: 7, y: 2, type: "classroom" },
-  { id: "classroom-4b", name: "classroom-4b", x: 15, y: 2, type: "classroom" },
-  { id: "library-counter", name: "library-counter", x: 20, y: 2, type: "library" },
-  { id: "library-shelf", name: "library-shelf", x: 20, y: 6, type: "library" },
-  { id: "general-office", name: "general-office", x: 15, y: 10, type: "office" },
-  { id: "auditorium", name: "auditorium", x: 7, y: 12, type: "auditorium" },
-  { id: "school-gate", name: "school-gate", x: 11, y: 21, type: "gate" },
-  { id: "corridor-mid", name: "corridor-mid", x: 11, y: 9, type: "corridor" },
+  ...INDOOR_LOCATIONS.map((loc) => ({
+    ...loc,
+    name: loc.id,
+    ...shiftPointX(loc, FUHUA_CAMPUS_PAD_X),
+  })),
+  { id: "sports-field", name: "sports-field", x: 5, y: 11, type: "empty" },
+  { id: "car-park", name: "car-park", x: 41, y: 11, type: "empty" },
 ];
 
 export const MAIN_SCHOOL_MAP: CampusMap = {

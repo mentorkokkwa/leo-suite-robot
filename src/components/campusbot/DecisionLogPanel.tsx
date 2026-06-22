@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocale } from "@/contexts/LocaleContext";
 import { formatDecisionEntry } from "@/lib/i18n";
 import type { DecisionLogEntry } from "@/lib/campusbot/types";
@@ -29,12 +29,30 @@ export function DecisionLogPanel({
     }
   }, [entries.length, latestTimestamp]);
 
+  const [expanded, setExpanded] = useState(false);
+  const panelHeight = expanded ? "h-48" : "h-28";
+
   return (
-    <div className="flex h-32 shrink-0 flex-col border-t border-cyan-900/40 bg-slate-950">
+    <div className={`flex ${panelHeight} shrink-0 flex-col border-t border-cyan-900/40 bg-slate-950 transition-all duration-200`}>
       <div className="flex items-center justify-between px-3 py-1.5">
-        <span className="text-sm font-semibold uppercase tracking-wide text-cyan-500">
-          {t("simulator.decisionLog")}
-        </span>
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="flex items-center gap-2 text-left"
+          aria-expanded={expanded}
+        >
+          <span className="text-sm font-semibold uppercase tracking-wide text-cyan-500">
+            {t("simulator.decisionLog")}
+          </span>
+          {entries.length > 0 && (
+            <span className="rounded-full bg-cyan-900/60 px-1.5 py-0.5 font-mono text-[10px] text-cyan-300">
+              {entries.length}
+            </span>
+          )}
+          <span className="text-[10px] text-slate-500">
+            {expanded ? "▲" : "▼"}
+          </span>
+        </button>
         {showReportLink && (
           <a
             href="/campusbot/report"
@@ -44,7 +62,7 @@ export function DecisionLogPanel({
           </a>
         )}
       </div>
-      <div className="flex-1 overflow-y-auto px-3 pb-2 font-mono text-sm">
+      <div className="flex-1 overflow-y-auto px-3 pb-2 font-mono text-xs">
         {display.length === 0 ? (
           <p className="text-slate-500">{t("simulator.noDecisions")}</p>
         ) : (
@@ -55,14 +73,15 @@ export function DecisionLogPanel({
               return (
                 <li
                   key={`${e.timestamp}-${i}`}
-                  className={`rounded px-1 py-0.5 text-slate-300 ${
+                  className={`rounded px-1.5 py-1 text-slate-300 ${
                     isLatest
-                      ? "bg-cyan-950/60 ring-1 ring-cyan-700/50"
-                      : ""
+                      ? "bg-cyan-950/70 ring-1 ring-cyan-700/60"
+                      : "opacity-70"
                   }`}
                 >
-                  <span className="text-cyan-600">[{actionLabel}]</span>{" "}
-                  ({e.robotPosition.x},{e.robotPosition.y}) — {reason}
+                  <span className="font-bold text-cyan-500">[{actionLabel}]</span>{" "}
+                  <span className="text-slate-500">({e.robotPosition.x},{e.robotPosition.y})</span>{" "}
+                  {reason}
                 </li>
               );
             })}

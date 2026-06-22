@@ -132,12 +132,30 @@ export default function ReportPage() {
               </ul>
             </section>
 
-            <p className="text-xs text-slate-600">
-              {t("report.generated")}:{" "}
-              {new Date(report.generatedAt).toLocaleString(
-                locale === "zh" ? "zh-CN" : "en-SG"
-              )}
-            </p>
+            {/* Demo value callout */}
+            <section className="rounded-lg border border-violet-800/50 bg-violet-950/20 p-5">
+              <h3 className="font-semibold text-violet-300">
+                💡 {t("report.demoValue")}
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-400">
+                {t("report.demoValueDesc")}
+              </p>
+            </section>
+
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-slate-600">
+                {t("report.generated")}:{" "}
+                {new Date(report.generatedAt).toLocaleString(
+                  locale === "zh" ? "zh-CN" : "en-SG"
+                )}
+              </p>
+              <Link
+                href="/campusbot/simulator"
+                className="rounded bg-cyan-700 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-cyan-600"
+              >
+                {t("report.backToSimulator")}
+              </Link>
+            </div>
           </article>
         )}
       </main>

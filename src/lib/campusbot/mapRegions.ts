@@ -20,6 +20,8 @@ export type MapRegion = {
   maxX: number;
   maxY: number;
   label: string;
+  /** True when the region contains a named campus location. */
+  isNamed: boolean;
 };
 
 function pointKey(x: number, y: number): string {
@@ -91,6 +93,7 @@ export function computeMapRegions(map: CampusMap, locale: Locale): MapRegion[] {
         maxX,
         maxY,
         label,
+        isNamed: !!locationInRegion,
       });
     }
   }

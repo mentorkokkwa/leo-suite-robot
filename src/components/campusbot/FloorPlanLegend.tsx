@@ -3,45 +3,37 @@
 import { useLocale } from "@/contexts/LocaleContext";
 
 /**
- * Compact legend for the SVG floor-plan map view.
+ * Compact legend for the floor-plan map.
  */
 export function FloorPlanLegend() {
   const { t } = useLocale();
 
   const items = [
-    { color: "#e8e4dc", label: t("simulator.legendCorridorFloor") },
-    { color: "#d4e8ff", label: t("cellType.classroom") },
-    { color: "#d0f0dc", label: t("cellType.library") },
-    { color: "#b8b2a6", label: t("cellType.wall") },
-    { color: "#0891b2", label: t("simulator.legendRouteLine") },
-    { color: "#f87171", label: t("simulator.legendOldPath") },
-    { emoji: "🤖", label: t("simulator.legendRobot") },
-    { emoji: "🧑‍🎓", label: t("simulator.legendAgent") },
+    { color: "#166534", label: t("simulator.legendStart"), dot: true },
+    { color: "#b45309", label: t("simulator.legendDest"), dot: true },
+    { color: "#2563eb", label: t("simulator.markerRobot"), dot: true },
+    { color: "#f97316", label: t("simulator.legendAgent"), dot: true },
+    { color: "#2563eb", label: t("simulator.legendRouteLine"), line: true },
+    { color: "#ef4444", label: t("simulator.legendOldPath"), dash: true },
   ];
 
   return (
-    <section className="rounded-md border border-stone-400/50 bg-white/90 px-2 py-1.5 shadow-sm backdrop-blur-sm">
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <span className="text-[11px] font-bold uppercase tracking-wide text-slate-600">
-          {t("simulator.floorPlanLegend")}
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-500">
+      {items.map((item) => (
+        <span key={item.label} className="flex items-center gap-1.5">
+          {item.line ? (
+            <span className="inline-block h-0.5 w-5 rounded bg-blue-600" />
+          ) : item.dash ? (
+            <span className="inline-block h-0.5 w-5 border-t-2 border-dashed border-red-400" />
+          ) : (
+            <span
+              className="inline-block h-2 w-2 rounded-full"
+              style={{ backgroundColor: item.color }}
+            />
+          )}
+          {item.label}
         </span>
-        {items.map((item) => (
-          <span
-            key={item.label}
-            className="flex items-center gap-1 text-xs text-slate-700"
-          >
-            {item.color ? (
-              <span
-                className="inline-block h-2.5 w-4 rounded-sm border border-stone-400/50"
-                style={{ backgroundColor: item.color }}
-              />
-            ) : (
-              <span className="text-sm leading-none">{item.emoji}</span>
-            )}
-            {item.label}
-          </span>
-        ))}
-      </div>
-    </section>
+      ))}
+    </div>
   );
 }

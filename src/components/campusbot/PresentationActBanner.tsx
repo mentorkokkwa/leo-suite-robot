@@ -10,6 +10,8 @@ import {
 
 type PresentationActBannerProps = {
   act: PresentationAct;
+  /** Optional callback to manually advance from the intro act. */
+  onAdvance?: () => void;
 };
 
 const ACT_INDEX: Record<PresentationAct, number> = {
@@ -21,20 +23,22 @@ const ACT_INDEX: Record<PresentationAct, number> = {
 };
 
 /**
- * Shows current staged-demo act title and progress dots.
+ * Shows current staged-demo act title, progress dots, and an optional
+ * "advance" button for the presenter to manually move past Act 1 (intro).
  */
-export function PresentationActBanner({ act }: PresentationActBannerProps) {
+export function PresentationActBanner({ act, onAdvance }: PresentationActBannerProps) {
   const { t } = useLocale();
   if (act === "off") return null;
 
   const titleKey = getActTitleKey(act);
   const descKey = getActDescKey(act);
   const current = ACT_INDEX[act];
+  const showAdvance = act === "intro" && onAdvance !== undefined;
 
   return (
     <div className="rounded-lg border border-violet-500/40 bg-gradient-to-r from-violet-950/80 to-indigo-950/60 px-3 py-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div>
+        <div className="min-w-0 flex-1">
           <p className="text-[10px] font-bold uppercase tracking-widest text-violet-300">
             {t("simulator.stagedDemo")} · {t("simulator.actProgress", {
               current: current + 1,
@@ -49,21 +53,41 @@ export function PresentationActBanner({ act }: PresentationActBannerProps) {
           {descKey && (
             <p className="mt-1 text-xs text-violet-200/80">{t(descKey)}</p>
           )}
+          {showAdvance && (
+            <p className="mt-1 text-[10px] text-violet-300/60">
+              {t("simulator.introAdvanceHint")}
+            </p>
+          )}
         </div>
-        <div className="flex gap-1.5">
-          {PRESENTATION_ACT_ORDER.map((step, index) => (
-            <span
-              key={step}
-              className={`h-2 w-8 rounded-full transition-colors ${
-                index < current
-                  ? "bg-violet-400"
-                  : index === current
-                    ? "bg-violet-300 ring-2 ring-violet-400/50"
-                    : "bg-slate-700"
-              }`}
-              title={t(getActTitleKey(step) ?? "")}
-            />
-          ))}
+
+        <div className="flex flex-col items-end gap-2">
+          {/* Act progress dots */}
+          <div className="flex gap-1.5">
+            {PRESENTATION_ACT_ORDER.map((step, index) => (
+              <span
+                key={step}
+                className={`h-2 w-8 rounded-full transition-colors ${
+                  index < current
+                    ? "bg-violet-400"
+                    : index === current
+                      ? "bg-violet-300 ring-2 ring-violet-400/50"
+                      : "bg-slate-700"
+                }`}
+                title={t(getActTitleKey(step) ?? "")}
+              />
+            ))}
+          </div>
+
+          {/* Presenter advance button (intro act only) */}
+          {showAdvance && (
+            <button
+              type="button"
+              onClick={onAdvance}
+              className="rounded bg-violet-600 px-3 py-1 text-xs font-bold text-white transition hover:bg-violet-500"
+            >
+              {t("simulator.introAdvance")}
+            </button>
+          )}
         </div>
       </div>
     </div>

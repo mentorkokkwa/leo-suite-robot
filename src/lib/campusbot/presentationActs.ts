@@ -79,7 +79,7 @@ export function getMapLayerVisibility(
   if (act === "navigate") {
     return {
       regionLabels: true,
-      startGoal: false,
+      startGoal: true,
       explored: false,
       path: true,
       oldPath: true,

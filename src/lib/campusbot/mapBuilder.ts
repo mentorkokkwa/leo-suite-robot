@@ -20,7 +20,8 @@ export function buildMapFromLayout(
   const charToType: Record<string, CellType> = {
     "#": WALL,
     ".": CORRIDOR,
-    "_": "empty",
+    _: "empty",
+    "~": "empty",
     O: "obstacle",
     R: "restricted",
     S: "staff_room",

@@ -7,22 +7,55 @@ export const GRID_UNIT = 1;
 export const MAP_VIEW_INSET = 1;
 
 /** Extra breathing room inside the SVG viewBox (grid units). */
-export const MAP_VIEW_PADDING = 0.25;
+export const MAP_VIEW_PADDING = 0.2;
 
 /** Cream backdrop shared with the simulator stage. */
-export const FLOOR_PLAN_BACKDROP = "#f7f4ee";
+export const FLOOR_PLAN_BACKDROP = "#ffffff";
+
+/** Stage background outside the map card. */
+export const MAP_STAGE_BACKDROP = "#f1f5f9";
+
+export type MapViewBounds = {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+};
+
+/**
+ * Parsed viewBox bounds for overlay positioning.
+ */
+export function mapViewBounds(map: CampusMap): MapViewBounds {
+  const inset = MAP_VIEW_INSET;
+  const pad = MAP_VIEW_PADDING;
+  return {
+    x: inset - pad,
+    y: inset - pad,
+    w: map.width - inset * 2 + pad * 2,
+    h: map.height - inset * 2 + pad * 2,
+  };
+}
+
+/**
+ * Converts a grid coordinate to percentage within the map viewBox.
+ */
+export function gridToPercent(
+  gx: number,
+  gy: number,
+  bounds: MapViewBounds
+): { left: number; top: number } {
+  return {
+    left: ((gx - bounds.x) / bounds.w) * 100,
+    top: ((gy - bounds.y) / bounds.h) * 100,
+  };
+}
 
 /**
  * SVG viewBox string that excludes the outer wall border with soft padding.
  */
 export function mapViewBox(map: CampusMap): string {
-  const inset = MAP_VIEW_INSET;
-  const pad = MAP_VIEW_PADDING;
-  const x = inset - pad;
-  const y = inset - pad;
-  const w = map.width - inset * 2 + pad * 2;
-  const h = map.height - inset * 2 + pad * 2;
-  return `${x} ${y} ${w} ${h}`;
+  const b = mapViewBounds(map);
+  return `${b.x} ${b.y} ${b.w} ${b.h}`;
 }
 
 /**
@@ -57,9 +90,9 @@ export function pathToPolyline(points: Point[]): string {
 
 /** Architectural floor-plan palette (light map style). */
 export const FLOOR_PLAN_PALETTE: Record<CellType, { fill: string; stroke: string }> = {
-  wall: { fill: "#b8b2a6", stroke: "#9a9488" },
-  corridor: { fill: "#e8e4dc", stroke: "#d4cfc4" },
-  empty: { fill: "#ebe7df", stroke: "#d4cfc4" },
+  wall: { fill: "#475569", stroke: "#334155" },
+  corridor: { fill: "#ffffff", stroke: "#e2e8f0" },
+  empty: { fill: "#ffffff", stroke: "#e2e8f0" },
   classroom: { fill: "#bdd4f5", stroke: "#7ba3d4" },
   staff_room: { fill: "#ccc9f0", stroke: "#8b85c9" },
   library: { fill: "#b8e0c8", stroke: "#5fa87a" },
@@ -78,14 +111,14 @@ export type RoomStyle = {
 
 /** Room zone styling for floor-plan regions. */
 export const ROOM_ZONE_STYLES: Record<CellType, RoomStyle> = {
-  classroom: { fill: "#d4e8ff", stroke: "#5b8fd4", icon: "🏫" },
-  staff_room: { fill: "#e0dcff", stroke: "#7b74c9", icon: "👩‍🏫" },
-  library: { fill: "#d0f0dc", stroke: "#4a9e6a", icon: "📚" },
-  office: { fill: "#e8dcff", stroke: "#8b6fc9", icon: "🏢" },
-  auditorium: { fill: "#ffd4e8", stroke: "#c96a9e", icon: "🎭" },
-  gate: { fill: "#c0f0d8", stroke: "#3d9e6a", icon: "🚪" },
-  corridor: { fill: "#e8e4dc", stroke: "#c4bfb4", icon: "" },
-  empty: { fill: "#ebe7df", stroke: "#c4bfb4", icon: "" },
+  classroom: { fill: "#f0f9ff", stroke: "#94a3b8", icon: "" },
+  staff_room: { fill: "#f5f3ff", stroke: "#94a3b8", icon: "" },
+  library: { fill: "#f0fdf4", stroke: "#94a3b8", icon: "" },
+  office: { fill: "#faf5ff", stroke: "#94a3b8", icon: "" },
+  auditorium: { fill: "#fdf2f8", stroke: "#94a3b8", icon: "" },
+  gate: { fill: "#ecfdf5", stroke: "#94a3b8", icon: "" },
+  corridor: { fill: "#ffffff", stroke: "#cbd5e1", icon: "" },
+  empty: { fill: "#ffffff", stroke: "#cbd5e1", icon: "" },
   wall: { fill: "#3d4f63", stroke: "#2d3748", icon: "" },
   obstacle: { fill: "#c4a574", stroke: "#8b6914", icon: "📦" },
   restricted: { fill: "#fee2e2", stroke: "#ef4444", icon: "⛔" },
@@ -113,8 +146,20 @@ export function regionRect(
     y: minY + padding,
     width: maxX - minX + 1 - padding * 2,
     height: maxY - minY + 1 - padding * 2,
-    rx: 0.18,
+    rx: 0.12,
   };
+}
+
+/**
+ * Font size for a room label in SVG user units.
+ */
+export function roomLabelFontSize(
+  rect: { width: number; height: number },
+  labelLength: number
+): number {
+  const byBox = Math.min(rect.width, rect.height) * 0.38;
+  const byChars = (rect.width * 0.92) / Math.max(labelLength, 2);
+  return Math.max(0.24, Math.min(0.34, byBox, byChars));
 }
 
 /**

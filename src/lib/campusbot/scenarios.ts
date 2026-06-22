@@ -1,4 +1,22 @@
-import type { SimulationScenario } from "./types";
+import { FUHUA_CAMPUS_PAD_X, shiftPointX } from "./fuhuaCampus";
+import type { Point, SimulationScenario } from "./types";
+
+/**
+ * Shifts scenario geometry to the wide Fuhua campus layout.
+ */
+function shiftScenarioGeometry<T extends { position: Point; path: Point[] }>(
+  agents: T[]
+): T[] {
+  return agents.map((agent) => ({
+    ...agent,
+    position: shiftPointX(agent.position, FUHUA_CAMPUS_PAD_X),
+    path: agent.path.map((p) => shiftPointX(p, FUHUA_CAMPUS_PAD_X)),
+  }));
+}
+
+function shiftPoints(points: Point[]): Point[] {
+  return points.map((p) => shiftPointX(p, FUHUA_CAMPUS_PAD_X));
+}
 
 /** Three demo scenarios with distinct navigation challenges. */
 export const DEMO_SCENARIOS: SimulationScenario[] = [
@@ -7,7 +25,7 @@ export const DEMO_SCENARIOS: SimulationScenario[] = [
     mapId: "school-main",
     taskId: "deliver-worksheet",
     watchKeys: ["astar", "studentBlock", "replan"],
-    dynamicAgents: [
+    dynamicAgents: shiftScenarioGeometry([
       {
         id: "student-1",
         labelKey: "student",
@@ -34,14 +52,14 @@ export const DEMO_SCENARIOS: SimulationScenario[] = [
         ],
         pathIndex: 0,
       },
-    ],
+    ]),
   },
   {
     id: "visitor-guide",
     mapId: "school-main",
     taskId: "guide-visitor",
     watchKeys: ["restricted", "crowd", "replan"],
-    dynamicAgents: [
+    dynamicAgents: shiftScenarioGeometry([
       {
         id: "visitor-group",
         labelKey: "crowd",
@@ -79,20 +97,20 @@ export const DEMO_SCENARIOS: SimulationScenario[] = [
         ],
         pathIndex: 0,
       },
-    ],
-    crowdedCorridor: [
+    ]),
+    crowdedCorridor: shiftPoints([
       { x: 11, y: 15 },
       { x: 11, y: 16 },
       { x: 10, y: 16 },
       { x: 9, y: 16 },
-    ],
+    ]),
   },
   {
     id: "library-return",
     mapId: "school-main",
     taskId: "return-book",
     watchKeys: ["narrow", "staticObstacle", "sensor"],
-    dynamicAgents: [
+    dynamicAgents: shiftScenarioGeometry([
       {
         id: "library-patron",
         labelKey: "patron",
@@ -104,14 +122,14 @@ export const DEMO_SCENARIOS: SimulationScenario[] = [
         ],
         pathIndex: 0,
       },
-    ],
-    extraObstacles: [
+    ]),
+    extraObstacles: shiftPoints([
       { x: 19, y: 3 },
       { x: 18, y: 4 },
       { x: 19, y: 4 },
       { x: 20, y: 4 },
       { x: 19, y: 5 },
-    ],
+    ]),
   },
 ];
 

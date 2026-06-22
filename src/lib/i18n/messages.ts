@@ -21,22 +21,41 @@ const en = {
     demoScenarios: "Demo Scenarios",
     demoScenariosDesc: "Three school missions with real navigation challenges.",
     coreModules: "Core Modules",
-    moduleMap: "Map Simulator",
+    moduleMap: "Campus Map",
     moduleMapDesc:
-      "Staff room, classrooms, library, office, auditorium, gate, corridors, restricted zones",
+      "Satellite-backed school layout: staff room, classrooms, library, auditorium, restricted zones — built for realistic A* navigation.",
     moduleTask: "Task Planner",
     moduleTaskDesc:
-      "Worksheet delivery, visitor guide, book return, document delivery",
+      "Four real school service missions — worksheet delivery, visitor guide, book return, document delivery — each with priority levels and safety constraints.",
     moduleNav: "Navigation Engine",
-    moduleNavDesc: "A*, obstacle detection, dynamic re-planning, safety rules",
+    moduleNavDesc:
+      "A* pathfinding with Manhattan heuristic, real-time obstacle detection, dynamic re-planning, and safety-mode zone avoidance.",
     moduleMetrics: "Metrics & Report",
-    moduleMetricsDesc: "Path length, collisions, re-plans, decision summary",
+    moduleMetricsDesc:
+      "Path length, time steps, collision events, re-planning count, decision log, and exportable simulation report.",
     scenariosTitle: "Demo Scenarios",
     challenge: "Challenge",
+    badge: "AI · Robotics · Pathfinding",
+    heroTitle: "AI-Powered School Service Robot",
+    heroSubtitle:
+      "Watch a campus robot plan optimal routes, avoid dynamic obstacles, and make real-time decisions — powered by A* pathfinding, live sensor simulation, and autonomous re-planning.",
+    ctaDemo: "▶ Run Live Demo",
+    ctaTeacher: "Educator Scenarios →",
+    whyTitle: "Why CampusBot AI?",
+    why1Title: "Real AI Algorithms",
+    why1Desc:
+      "A* pathfinding, Manhattan heuristic, dynamic obstacle detection, and real-time route re-planning — the same core techniques used in autonomous vehicles and warehouse robots.",
+    why2Title: "Classroom-Ready",
+    why2Desc:
+      "Step-by-step presenter mode, live narrative timeline, and a full decision log make every AI decision visible and explainable for students at any level.",
+    why3Title: "Authentic School Scenarios",
+    why3Desc:
+      "Three real-world service missions with safety rules, restricted zones, and dynamic human obstacles — grounded in an actual Singapore secondary school campus.",
+    openScenario: "Open in simulator →",
   },
   maps: {
     title: "School Maps",
-    subtitle: "2D grid representation of Greenfield Secondary School.",
+    subtitle: "Wide campus view of Fuhua Secondary School with illustrative indoor overlay.",
     locations: "Locations",
     cellDistribution: "Cell distribution",
     cells: "{{count}} cells",
@@ -52,14 +71,20 @@ const en = {
     safetyRules: "Safety rules",
   },
   experiments: {
-    title: "Experiments",
+    title: "Demo Scenarios",
     subtitle:
-      "Pre-configured demo scenarios for portfolio demonstrations and CCA robotics training.",
-    challenge: "Challenge",
+      "Three pre-configured school service missions — each designed to showcase a distinct AI navigation challenge. Ideal for classroom teaching, CCA robotics training, and client demonstrations.",
+    challenge: "AI Challenge",
     route: "Route",
     dynamicAgents: "Dynamic agents",
     extraObstacles: "Extra obstacles",
-    openInSimulator: "Open in simulator",
+    openInSimulator: "▶ Run this scenario",
+    teacherTip: "Educator tip",
+    teacherTipDesc:
+      "Switch to Step-by-step mode in the simulator to pause at every robot decision and explain the algorithm to your class. Use the Decision Log and Narrative Timeline as teaching aids.",
+    teacherTip2: "Presentation tip",
+    teacherTip2Desc:
+      "Click \"▶ Play staged demo\" for a 4-act guided walkthrough: campus overview → A* planning → autonomous navigation → mission complete.",
   },
   report: {
     title: "Simulation Report",
@@ -77,11 +102,15 @@ const en = {
     decisionSummary: "Decision summary",
     whatWorked: "What worked",
     whatFailed: "What failed",
-    futureHardware: "Future hardware extension",
+    futureHardware: "Real-robot Extension Roadmap",
     futureNote:
-      "Planned extensions only — not implemented in this simulator.",
+      "Planned hardware integrations — not yet implemented in this simulator.",
     generated: "Generated",
     none: "—",
+    demoValue: "What this simulation demonstrates",
+    demoValueDesc:
+      "This report is generated entirely in-browser from the live simulation — no backend required. It shows how an AI agent tracks its own decisions, measures performance, and identifies areas for improvement. The same architecture applies directly to physical robots with a hardware abstraction layer.",
+    backToSimulator: "Run another simulation",
   },
   simulator: {
     loading: "Loading simulator…",
@@ -155,6 +184,10 @@ const en = {
     mapLegendDesc: "Icons show rooms, furniture, and obstacles on the school floor plan.",
     floorPlanLegend: "Floor plan legend",
     floorPlanAria: "School floor plan navigation map",
+    mapModeTitle: "Fuhua campus — satellite + illustrative indoor overlay",
+    mapModeDesc:
+      "Real satellite backdrop around Fuhua Secondary School (Jurong West). The indoor block is a schematic grid for A* pathfinding — not an official floor plan.",
+    mapAttribution: "Satellite © Esri · Indoor layout illustrative",
     legendCorridorFloor: "Corridor floor",
     legendRouteLine: "Planned route (continuous path)",
     missionRoute: "{{from}} → {{to}}",
@@ -181,6 +214,20 @@ const en = {
         desc: "Review the path taken and open the simulation report.",
       },
     },
+    astarTitle: "A* Path Planning",
+    astarExploring: "searching…",
+    astarExplored: "Nodes explored",
+    astarPath: "Steps in path",
+    astarEfficiency: "Search efficiency",
+    astarEfficiencyNote: "(path ÷ explored)",
+    astarExplain:
+      "A* expands the lowest-cost node first, guided by Manhattan distance to the goal. This guarantees the shortest safe route without searching the entire map. Amber cells = the search frontier explored before finding the optimal path.",
+    astarSafetyActive:
+      "Safety mode active — restricted admin zones are excluded from the search space.",
+    runningTask: "Active mission",
+    runningRoute: "Route",
+    introAdvance: "▶ Begin A* planning",
+    introAdvanceHint: "Campus overview ready — click to start path planning.",
   },
   narrative: {
     pathPlannedTitle: "Route planned",
@@ -239,7 +286,7 @@ const en = {
   },
   algorithm: { astar: "A* Path Planning" },
   map: {
-    "school-main": "Greenfield Secondary School",
+    "school-main": "Fuhua Secondary School",
   },
   location: {
     "staff-room": "Staff Room",
@@ -251,6 +298,8 @@ const en = {
     auditorium: "Auditorium",
     "school-gate": "School Gate",
     "corridor-mid": "Main Corridor",
+    "sports-field": "Football Field",
+    "car-park": "Car Park",
   },
   cellLabel: {
     "staff-room": "Staff Room",
@@ -406,20 +455,41 @@ const zh = {
     demoScenarios: "演示场景",
     demoScenariosDesc: "三个真实校园导航挑战任务。",
     coreModules: "核心模块",
-    moduleMap: "地图仿真",
-    moduleMapDesc: "教师室、教室、图书馆、办公室、礼堂、校门、走廊、禁区",
+    moduleMap: "校园地图",
+    moduleMapDesc:
+      "卫星底图校园布局：教师室、教室、图书馆、礼堂、禁区——为真实 A* 导航而构建。",
     moduleTask: "任务规划",
-    moduleTaskDesc: "作业配送、访客引导、图书归还、文件递送",
+    moduleTaskDesc:
+      "四项真实校园服务任务——作业配送、访客引导、图书归还、文件递送，各含优先级与安全约束。",
     moduleNav: "导航引擎",
-    moduleNavDesc: "A*、障碍检测、动态重规划、安全规则",
+    moduleNavDesc:
+      "A* 寻路（曼哈顿启发式）、实时障碍检测、动态重规划与安全模式禁区规避。",
     moduleMetrics: "指标与报告",
-    moduleMetricsDesc: "路径长度、碰撞、重规划次数、决策摘要",
+    moduleMetricsDesc:
+      "路径长度、时间步、碰撞次数、重规划次数、决策日志，可导出完整仿真报告。",
     scenariosTitle: "演示场景",
     challenge: "挑战",
+    badge: "AI · 机器人 · 路径规划",
+    heroTitle: "AI 驱动的校园服务机器人",
+    heroSubtitle:
+      "观看校园机器人规划最优路线、绕避动态障碍、实时决策——由 A* 寻路算法、实时传感器仿真与自主重规划共同驱动。",
+    ctaDemo: "▶ 启动实时演示",
+    ctaTeacher: "教学场景 →",
+    whyTitle: "为什么选择 CampusBot AI？",
+    why1Title: "真实 AI 算法",
+    why1Desc:
+      "A* 寻路、曼哈顿启发式、动态障碍检测与实时重规划——与自动驾驶车辆、仓库机器人相同的核心技术。",
+    why2Title: "开箱即用的教学工具",
+    why2Desc:
+      "逐步演示模式、实时解说时间线与完整决策日志，让 AI 每一步决策都清晰可见，适合各层次学生。",
+    why3Title: "真实校园场景",
+    why3Desc:
+      "三个真实服务任务，含安全规则、禁区与动态人员障碍——以新加坡真实中学校园为原型构建。",
+    openScenario: "在仿真器中打开 →",
   },
   maps: {
     title: "学校地图",
-    subtitle: "Greenfield 中学的二维网格地图。",
+    subtitle: "福华中学（Fuhua Secondary School）宽屏校园视图，叠加示意性室内网格。",
     locations: "地点",
     cellDistribution: "单元格分布",
     cells: "{{count}} 格",
@@ -434,13 +504,20 @@ const zh = {
     safetyRules: "安全规则",
   },
   experiments: {
-    title: "实验",
-    subtitle: "预置演示场景，适用于作品集展示与机器人 CCA 训练。",
-    challenge: "挑战",
+    title: "演示场景",
+    subtitle:
+      "三个预置校园服务任务，每个场景展示不同的 AI 导航挑战。适用于课堂教学、机器人 CCA 训练与客户演示。",
+    challenge: "AI 挑战",
     route: "路线",
     dynamicAgents: "动态智能体",
     extraObstacles: "额外障碍",
-    openInSimulator: "在仿真器中打开",
+    openInSimulator: "▶ 运行此场景",
+    teacherTip: "教师提示",
+    teacherTipDesc:
+      "在仿真器中切换到「逐步讲解」模式，每次机器人决策时暂停，向学生解释算法逻辑。决策日志与实时解说时间线可作为教学辅助工具。",
+    teacherTip2: "演示提示",
+    teacherTip2Desc:
+      "点击「▶ 播放分幕演示」进行 4 幕引导演示：校园概览 → A* 规划 → 自主导航 → 任务完成。",
   },
   report: {
     title: "仿真报告",
@@ -458,10 +535,14 @@ const zh = {
     decisionSummary: "决策摘要",
     whatWorked: "成功之处",
     whatFailed: "失败之处",
-    futureHardware: "未来硬件扩展",
-    futureNote: "仅为计划项 — 本仿真器尚未实现。",
+    futureHardware: "真实机器人扩展路线图",
+    futureNote: "计划中的硬件集成项目 — 本仿真器尚未实现。",
     generated: "生成时间",
     none: "—",
+    demoValue: "本次仿真演示了什么",
+    demoValueDesc:
+      "本报告完全在浏览器端由实时仿真生成，无需后端。它展示了 AI 智能体如何追踪自身决策、衡量性能并识别改进空间。同样的架构可通过硬件抽象层直接应用于真实机器人。",
+    backToSimulator: "再次运行仿真",
   },
   simulator: {
     loading: "正在加载仿真器…",
@@ -534,6 +615,10 @@ const zh = {
     mapLegendDesc: "图标表示学校平面图上的房间、桌椅与障碍物。",
     floorPlanLegend: "平面图图例",
     floorPlanAria: "学校平面图导航地图",
+    mapModeTitle: "福华校园 — 卫星底图 + 示意性室内层",
+    mapModeDesc:
+      "真实卫星影像（新加坡裕廊西福华中学周边）。中间白色区域为 A* 路径规划用的示意建筑网格，非官方平面图。",
+    mapAttribution: "卫星 © Esri · 室内布局为示意",
     legendCorridorFloor: "走廊地面",
     legendRouteLine: "规划路线（连续路径）",
     missionRoute: "{{from}} → {{to}}",
@@ -560,6 +645,19 @@ const zh = {
         desc: "查看行走轨迹，并可打开仿真报告。",
       },
     },
+    astarTitle: "A* 路径规划",
+    astarExploring: "搜索中…",
+    astarExplored: "已探索节点",
+    astarPath: "路径步数",
+    astarEfficiency: "搜索效率",
+    astarEfficiencyNote: "（路径÷探索）",
+    astarExplain:
+      "A* 优先展开综合代价（已走距离 + 启发式估算）最低的节点，由曼哈顿距离引导方向。这保证了在不遍历整张地图的前提下找到最短安全路线。琥珀色格子 = 找到最优路径前的搜索范围。",
+    astarSafetyActive: "安全模式已开启——禁区已从搜索空间中排除。",
+    runningTask: "当前任务",
+    runningRoute: "路线",
+    introAdvance: "▶ 开始 A* 规划",
+    introAdvanceHint: "校园概览已就绪——点击开始路径规划。",
   },
   narrative: {
     pathPlannedTitle: "路线已规划",
@@ -616,7 +714,7 @@ const zh = {
   },
   algorithm: { astar: "A* 路径规划" },
   map: {
-    "school-main": "Greenfield 中学",
+    "school-main": "福华中学",
   },
   location: {
     "staff-room": "教师室",
@@ -628,6 +726,8 @@ const zh = {
     auditorium: "礼堂",
     "school-gate": "校门",
     "corridor-mid": "主走廊",
+    "sports-field": "足球场",
+    "car-park": "停车场",
   },
   cellLabel: {
     "staff-room": "教师室",

@@ -112,7 +112,7 @@ export function useCampusSimulation() {
     paused: false,
     planningPhase: false,
     speed: "slow",
-    playbackMode: "step",
+    playbackMode: "auto",
     stagedDemo: false,
   });
 
@@ -579,6 +579,8 @@ export function useCampusSimulation() {
     reset,
     start,
     startStagedDemo,
+    /** Advance staged demo from intro act to A* planning. */
+    advanceFromIntro: beginPlanning,
     pause,
     stepForward,
     addObstacle,

@@ -2,25 +2,34 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocale } from "@/contexts/LocaleContext";
-import { locationName, formatDecisionEntry, t as translate } from "@/lib/i18n";
+import { locationName, t as translate } from "@/lib/i18n";
+import { useMapViewportSize } from "@/hooks/useMapViewportSize";
+import { mapAspectRatio } from "@/lib/campusbot/mapViewport";
+import {
+  FUHUA_AERIAL_IMAGE_PATH,
+  FUHUA_EXTERIOR_LABELS,
+  FUHUA_INDOOR_BOUNDS,
+  isExteriorGround,
+  isIndoorCell,
+} from "@/lib/campusbot/fuhuaCampus";
 import { computeMapRegions } from "@/lib/campusbot/mapRegions";
 import {
   cellCenter,
-  FLOOR_PLAN_BACKDROP,
   FLOOR_PLAN_PALETTE,
   getFeatureMarkers,
   isPerimeterWall,
   mapViewBox,
+  MAP_STAGE_BACKDROP,
   MAP_VIEW_INSET,
   pathToPolyline,
   regionRect,
+  roomLabelFontSize,
   ROOM_ZONE_STYLES,
 } from "@/lib/campusbot/floorPlanGeometry";
 import type { PresentationAct } from "@/lib/campusbot/presentationActs";
 import { getMapLayerVisibility } from "@/lib/campusbot/presentationActs";
 import type {
   CampusMap,
-  DecisionLogEntry,
   DynamicAgent,
   Point,
   RobotState,
@@ -31,10 +40,10 @@ import { PresentationActBanner } from "./PresentationActBanner";
 import { FloorPlanLegend } from "./FloorPlanLegend";
 
 const AGENT_LABEL: Record<string, string> = {
-  student: "🧑‍🎓",
-  crowd: "👥",
-  teacher: "👩‍🏫",
-  patron: "📖",
+  student: "S",
+  crowd: "C",
+  teacher: "T",
+  patron: "P",
 };
 
 type MapFloorPlanViewProps = {
@@ -47,10 +56,11 @@ type MapFloorPlanViewProps = {
   replacedPath?: Point[];
   planningPhase?: boolean;
   running?: boolean;
-  lastLogEntry?: DecisionLogEntry;
   addObstacleMode: boolean;
   presentationAct?: PresentationAct;
   moveDurationMs?: number;
+  /** Called when presenter clicks "advance" in the intro act banner. */
+  onAdvanceFromIntro?: () => void;
   onCellClick: (point: Point) => void;
 };
 
@@ -111,13 +121,14 @@ export function MapFloorPlanView({
   replacedPath = [],
   planningPhase = false,
   running = false,
-  lastLogEntry,
   addObstacleMode,
   presentationAct = "off",
   moveDurationMs = 1800,
+  onAdvanceFromIntro,
   onCellClick,
 }: MapFloorPlanViewProps) {
   const { locale, t } = useLocale();
+  const stageRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const task = getTaskById(taskId);
   const start = task ? getLocationById(map, task.startLocationId) : undefined;
@@ -137,9 +148,8 @@ export function MapFloorPlanView({
     moveDurationMs
   );
 
-  const startName = start ? locationName(locale, start.id) : "—";
   const goalName = goal ? locationName(locale, goal.id) : "—";
-  const taskLabel = task ? translate(locale, `task.${task.id}.name`) : "";
+  const startName = start ? locationName(locale, start.id) : "—";
   const totalSteps =
     robot.completedSteps + Math.max(0, robot.currentPath.length - 1);
 
@@ -177,38 +187,59 @@ export function MapFloorPlanView({
   const viewInset = MAP_VIEW_INSET;
   const innerW = map.width - viewInset * 2;
   const innerH = map.height - viewInset * 2;
+  const aspect = useMemo(
+    () => mapAspectRatio(map.width, map.height, viewInset),
+    [map.width, map.height, viewInset]
+  );
+  const frameSize = useMapViewportSize(stageRef, aspect);
 
   return (
-    <div className="flex min-h-[52vh] min-w-0 flex-1 flex-col overflow-hidden bg-[#f7f4ee] xl:min-h-0">
+    <div
+      className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
+      style={{ backgroundColor: MAP_STAGE_BACKDROP }}
+    >
       {presentationAct !== "off" && (
         <div className="shrink-0 px-2 pt-1">
-          <PresentationActBanner act={presentationAct} />
+          <PresentationActBanner
+            act={presentationAct}
+            onAdvance={onAdvanceFromIntro}
+          />
         </div>
       )}
 
       <div
-        className={`mx-2 mb-1 shrink-0 rounded-lg border px-3 py-2 text-sm font-medium ${statusTone(robot, planningPhase, running)}`}
+        className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-200 bg-white px-3 py-1.5"
         role="status"
         aria-live="polite"
       >
-        {statusText}
-        {planningPhase && layers.explored && (
-          <span className="mt-0.5 block text-xs opacity-90">
-            {t("simulator.planningExplored", { count: exploredCells.length })}
-          </span>
-        )}
-        {lastLogEntry && running && robot.status === "moving" && (
-          <span className="mt-0.5 block text-xs opacity-90">
-            {formatDecisionEntry(locale, lastLogEntry).reason}
-          </span>
-        )}
+        <p className="min-w-0 flex-1 truncate text-xs text-slate-600">
+          {statusText}
+          {planningPhase && layers.explored && (
+            <span className="ml-2 text-slate-400">
+              {t("simulator.planningExplored", { count: exploredCells.length })}
+            </span>
+          )}
+        </p>
+        <FloorPlanLegend />
       </div>
 
-      <div className="relative min-h-0 flex-1">
+      <div
+        ref={stageRef}
+        className="flex min-h-0 flex-1 items-center justify-center p-3"
+      >
+        <div
+          className="relative shrink-0 overflow-hidden rounded-md border border-slate-300 bg-white shadow-sm"
+          style={{
+            width: frameSize.width > 0 ? frameSize.width : "100%",
+            height: frameSize.height > 0 ? frameSize.height : "100%",
+            maxWidth: "100%",
+            maxHeight: "100%",
+          }}
+        >
         <svg
           ref={svgRef}
           viewBox={mapViewBox(map)}
-          className={`absolute inset-0 h-full w-full select-none ${
+          className={`block h-full w-full select-none ${
             addObstacleMode ? "cursor-crosshair" : "cursor-default"
           }`}
           preserveAspectRatio="xMidYMid meet"
@@ -218,12 +249,12 @@ export function MapFloorPlanView({
         >
           <defs>
             <pattern
-              id="floorGrid"
-              width="0.25"
-              height="0.25"
+              id="corridorTile"
+              width="1"
+              height="1"
               patternUnits="userSpaceOnUse"
             >
-              <circle cx="0.125" cy="0.125" r="0.02" fill="#c4bfb4" opacity="0.35" />
+              <rect width="1" height="1" fill="#ffffff" />
             </pattern>
             <pattern
               id="restrictedHatch"
@@ -235,33 +266,83 @@ export function MapFloorPlanView({
               <line x1="0" y1="0" x2="0" y2="0.2" stroke="#ef4444" strokeWidth="0.04" />
             </pattern>
             <filter id="robotShadow" x="-50%" y="-50%" width="200%" height="200%">
-              <feDropShadow dx="0" dy="0.06" stdDeviation="0.08" floodOpacity="0.35" />
+              <feDropShadow dx="0" dy="0.04" stdDeviation="0.05" floodOpacity="0.2" />
             </filter>
+            {/* Drop shadow for location pin badges */}
+            <filter id="labelShadow" x="-40%" y="-40%" width="180%" height="180%">
+              <feDropShadow dx="0.05" dy="0.08" stdDeviation="0.09" floodOpacity="0.38" />
+            </filter>
+            {/* Path-end arrow — sized to match marker circles (r ≈ 0.22) */}
             <marker
               id="arrowPath"
-              markerWidth="6"
-              markerHeight="6"
-              refX="5"
-              refY="3"
+              markerUnits="userSpaceOnUse"
+              markerWidth="0.44"
+              markerHeight="0.44"
+              refX="0.4"
+              refY="0.22"
               orient="auto"
             >
-              <polygon points="0 0, 6 3, 0 6" fill="#0891b2" />
+              <polygon points="0 0, 0.44 0.22, 0 0.44" fill="#2563eb" />
             </marker>
           </defs>
 
-          {/* Full-stage floor (no outer wall frame) */}
-          <rect
+          {/* Satellite backdrop (Fuhua Secondary School, Jurong West) */}
+          <image
+            href={FUHUA_AERIAL_IMAGE_PATH}
             x={viewInset}
             y={viewInset}
             width={innerW}
             height={innerH}
-            fill={FLOOR_PLAN_BACKDROP}
+            preserveAspectRatio="xMidYMid slice"
+            opacity={0.94}
           />
 
-          {/* Corridor / open floor */}
+          {/* Outdoor grounds tint */}
           {map.cells.flatMap((row) =>
             row
-              .filter((c) => c.type === "corridor" || c.type === "empty")
+              .filter((c) => isExteriorGround(c))
+              .map((cell) => (
+                <rect
+                  key={`ext-${cell.x}-${cell.y}`}
+                  x={cell.x}
+                  y={cell.y}
+                  width={1}
+                  height={1}
+                  fill="#16a34a"
+                  opacity={0.12}
+                />
+              ))
+          )}
+
+          {/* Illustrative indoor schematic panel */}
+          <rect
+            x={FUHUA_INDOOR_BOUNDS.minX - 0.08}
+            y={FUHUA_INDOOR_BOUNDS.minY - 0.08}
+            width={
+              FUHUA_INDOOR_BOUNDS.maxX -
+              FUHUA_INDOOR_BOUNDS.minX +
+              1.16
+            }
+            height={
+              FUHUA_INDOOR_BOUNDS.maxY -
+              FUHUA_INDOOR_BOUNDS.minY +
+              1.16
+            }
+            fill="#ffffff"
+            opacity={0.84}
+            rx={0.18}
+            stroke="#cbd5e1"
+            strokeWidth={0.06}
+          />
+
+          {/* Corridor / open floor (indoor only) */}
+          {map.cells.flatMap((row) =>
+            row
+              .filter(
+                (c) =>
+                  (c.type === "corridor" || c.type === "empty") &&
+                  isIndoorCell(c.x, c.y)
+              )
               .map((cell) => (
                 <rect
                   key={`floor-${cell.x}-${cell.y}`}
@@ -269,7 +350,7 @@ export function MapFloorPlanView({
                   y={cell.y}
                   width={1}
                   height={1}
-                  fill="url(#floorGrid)"
+                  fill="url(#corridorTile)"
                   stroke="none"
                 />
               ))
@@ -297,21 +378,22 @@ export function MapFloorPlanView({
                   fill={style.fill}
                   stroke={style.stroke}
                   strokeWidth={isStart || isGoal ? 0.1 : 0.06}
-                  opacity={0.95}
+                  opacity={0.96}
                 />
-                <text
-                  x={rect.x + rect.width / 2}
-                  y={rect.y + rect.height / 2}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fontSize={Math.max(0.36, Math.min(0.52, rect.width * 0.24))}
-                  fontWeight={600}
-                  fill="#0f172a"
-                  pointerEvents="none"
-                >
-                  {style.icon ? `${style.icon} ` : ""}
-                  {region.label}
-                </text>
+                {region.isNamed && (
+                  <text
+                    x={rect.x + rect.width / 2}
+                    y={rect.y + rect.height / 2}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontSize={roomLabelFontSize(rect, region.label.length)}
+                    fontWeight={500}
+                    fill="#334155"
+                    pointerEvents="none"
+                  >
+                    {region.label}
+                  </text>
+                )}
               </g>
             );
           })}
@@ -350,8 +432,8 @@ export function MapFloorPlanView({
                     strokeWidth={0.04}
                     rx={0.08}
                   />
-                  <text x={cx} y={cy} textAnchor="middle" fontSize={0.35} dominantBaseline="middle">
-                    ⛔
+                  <text x={cx} y={cy} textAnchor="middle" fontSize={0.28} dominantBaseline="middle" fill="#dc2626" fontWeight={700}>
+                    ×
                   </text>
                 </g>
               );
@@ -360,18 +442,15 @@ export function MapFloorPlanView({
               return (
                 <g key={`o-${f.point.x}-${f.point.y}`}>
                   <rect
-                    x={f.point.x + 0.15}
-                    y={f.point.y + 0.2}
-                    width={0.7}
-                    height={0.55}
-                    fill="#c4a574"
-                    stroke="#8b6914"
-                    strokeWidth={0.04}
-                    rx={0.06}
+                    x={f.point.x + 0.2}
+                    y={f.point.y + 0.25}
+                    width={0.6}
+                    height={0.5}
+                    fill="#d6d3d1"
+                    stroke="#78716c"
+                    strokeWidth={0.03}
+                    rx={0.04}
                   />
-                  <text x={cx} y={cy + 0.05} textAnchor="middle" fontSize={0.3} dominantBaseline="middle">
-                    📦
-                  </text>
                 </g>
               );
             }
@@ -404,30 +483,30 @@ export function MapFloorPlanView({
               />
             ))}
 
-          {/* Abandoned route */}
+          {/* Abandoned route (red dashed — clearly marks old discarded path) */}
           {layers.oldPath && replacedPath.length > 1 && (
             <polyline
               points={pathToPolyline(replacedPath)}
               fill="none"
               stroke="#f87171"
-              strokeWidth={0.1}
+              strokeWidth={0.18}
               strokeLinecap="round"
               strokeLinejoin="round"
-              strokeDasharray="0.15 0.12"
-              opacity={0.85}
+              strokeDasharray="0.18 0.13"
+              opacity={0.9}
             />
           )}
 
-          {/* Trail */}
+          {/* Trail (path already walked) */}
           {trailLine.length > 1 && (
             <polyline
               points={pathToPolyline(trailLine)}
               fill="none"
-              stroke="#67e8f9"
-              strokeWidth={0.14}
+              stroke="#38bdf8"
+              strokeWidth={0.18}
               strokeLinecap="round"
               strokeLinejoin="round"
-              opacity={0.45}
+              opacity={0.5}
             />
           )}
 
@@ -436,12 +515,12 @@ export function MapFloorPlanView({
             <polyline
               points={pathToPolyline(fullPath)}
               fill="none"
-              stroke="#0891b2"
-              strokeWidth={0.12}
+              stroke="#2563eb"
+              strokeWidth={0.18}
               strokeLinecap="round"
               strokeLinejoin="round"
               markerEnd="url(#arrowPath)"
-              opacity={planningPhase ? 0.7 : 0.95}
+              opacity={planningPhase ? 0.75 : 0.97}
             />
           )}
 
@@ -457,77 +536,104 @@ export function MapFloorPlanView({
             />
           )}
 
-          {/* Dynamic agents */}
+          {/* Dynamic agents — orange circles with readable name labels */}
           {layers.agents &&
             dynamicAgents.map((agent) => (
               <g
                 key={agent.id}
                 transform={`translate(${agent.position.x + 0.5}, ${agent.position.y + 0.5})`}
               >
-                <circle r={0.3} fill="#fed7aa" stroke="#ea580c" strokeWidth={0.04} />
+                {/* Agent name label — larger font with dark outline for legibility */}
+                <text
+                  y={-0.48}
+                  textAnchor="middle"
+                  fontSize={0.44}
+                  fontWeight={700}
+                  fill="#fed7aa"
+                  stroke="#431407"
+                  strokeWidth={0.068}
+                  paintOrder="stroke"
+                >
+                  {translate(locale, `agent.${agent.labelKey}`)}
+                </text>
+                {/* Larger agent circle for better visibility */}
+                <circle r={0.24} fill="#f97316" stroke="#c2410c" strokeWidth={0.04} />
                 <text
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  fontSize={0.34}
-                  y={0.02}
+                  fontSize={0.2}
+                  fill="white"
+                  fontWeight={700}
+                  y={0.01}
                 >
-                  {AGENT_LABEL[agent.labelKey] ?? "🧑"}
+                  {AGENT_LABEL[agent.labelKey] ?? "?"}
                 </text>
               </g>
             ))}
 
-          {/* Start / goal pins */}
+          {/* Start pin — professional map-pin badge with triangle pointer */}
           {layers.startGoal && start && (
-            <g transform={`translate(${start.x + 0.5}, ${start.y + 0.5})`}>
-              <line x1={0} y1={0.35} x2={0} y2={-0.15} stroke="#16a34a" strokeWidth={0.04} />
-              <polygon points="0,-0.35 -0.18,-0.1 0.18,-0.1" fill="#22c55e" />
-              <text y={0.55} textAnchor="middle" fontSize={0.28} fill="#166534" fontWeight={700}>
-                START
+            <g transform={`translate(${start.x + 0.5}, ${start.y + 0.12})`} filter="url(#labelShadow)">
+              {/* Badge body: 3.0 wide × 0.9 tall — readable at all scales */}
+              <rect x={-1.5} y={-1.15} width={3.0} height={0.9} rx={0.14}
+                fill="#166534" stroke="#ffffff" strokeWidth={0.05} />
+              <text x={0} y={-0.70} textAnchor="middle" dominantBaseline="middle"
+                fontSize={0.60} fontWeight={800} fill="white">
+                {t("simulator.legendStart")}
               </text>
+              {/* Downward-pointing triangle connector */}
+              <polygon points="0,0 -0.26,-0.25 0.26,-0.25" fill="#166534" />
             </g>
           )}
+          {/* Goal pin — professional map-pin badge with triangle pointer */}
           {layers.startGoal && goal && (
-            <g transform={`translate(${goal.x + 0.5}, ${goal.y + 0.5})`}>
-              <circle r={0.2} fill="#f59e0b" stroke="#b45309" strokeWidth={0.04} />
-              <circle r={0.08} fill="#fef3c7" />
-              <text y={0.5} textAnchor="middle" fontSize={0.28} fill="#92400e" fontWeight={700}>
-                GOAL
+            <g transform={`translate(${goal.x + 0.5}, ${goal.y + 0.12})`} filter="url(#labelShadow)">
+              <rect x={-1.5} y={-1.15} width={3.0} height={0.9} rx={0.14}
+                fill="#b45309" stroke="#ffffff" strokeWidth={0.05} />
+              <text x={0} y={-0.70} textAnchor="middle" dominantBaseline="middle"
+                fontSize={0.60} fontWeight={800} fill="white">
+                {t("simulator.legendDest")}
               </text>
+              <polygon points="0,0 -0.26,-0.25 0.26,-0.25" fill="#b45309" />
+            </g>
+          )}
+          {/* Goal beacon — subtle pulse, same scale as robot/agent circles */}
+          {goal && running && !planningPhase && (
+            <g transform={`translate(${goal.x + 0.5}, ${goal.y + 0.5})`}>
+              <circle r={0.22} fill="none" stroke="#fbbf24" strokeWidth={0.05} opacity={0.85}>
+                <animate attributeName="r"
+                  values="0.2;0.28;0.2" dur="2.4s" repeatCount="indefinite" />
+                <animate attributeName="opacity"
+                  values="0.85;0.35;0.85" dur="2.4s" repeatCount="indefinite" />
+              </circle>
             </g>
           )}
 
           {/* CampusBot */}
           {layers.robot && (
-            <g
-              transform={`translate(${robotPos.x}, ${robotPos.y})`}
-              filter="url(#robotShadow)"
-            >
-              <circle r={0.38} fill="#0891b2" stroke="#0e7490" strokeWidth={0.05} />
-              <text
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fontSize={0.44}
-                y={0.02}
-              >
-                🤖
-              </text>
+            <g transform={`translate(${robotPos.x}, ${robotPos.y})`}>
+              {/* Robot identity — dark pill badge for high contrast readability */}
+              <g transform="translate(0, -0.66)">
+                <rect x={-1.0} y={-0.3} width={2.0} height={0.56} rx={0.12}
+                  fill="rgba(15,23,42,0.88)" stroke="rgba(147,197,253,0.45)" strokeWidth={0.032} />
+                <text textAnchor="middle" dominantBaseline="middle"
+                  fontSize={0.52} fontWeight={700} fill="#93c5fd">
+                  {t("simulator.markerRobot")}
+                </text>
+              </g>
+              <circle r={0.22} fill="#2563eb" stroke="#1d4ed8" strokeWidth={0.04} />
+              <circle r={0.08} fill="#ffffff" />
               {running && !planningPhase && (
                 <circle
-                  r={0.48}
+                  r={0.36}
                   fill="none"
-                  stroke="#22d3ee"
+                  stroke="#93c5fd"
                   strokeWidth={0.04}
-                  opacity={0.7}
+                  opacity={0.8}
                 >
                   <animate
                     attributeName="r"
-                    values="0.38;0.52;0.38"
-                    dur="1.5s"
-                    repeatCount="indefinite"
-                  />
-                  <animate
-                    attributeName="opacity"
-                    values="0.7;0.2;0.7"
+                    values="0.28;0.38;0.28"
                     dur="1.5s"
                     repeatCount="indefinite"
                   />
@@ -535,56 +641,62 @@ export function MapFloorPlanView({
               )}
             </g>
           )}
+
+          {/* Exterior POI labels on satellite backdrop */}
+          {FUHUA_EXTERIOR_LABELS.map((spot) => (
+            <text
+              key={spot.id}
+              x={spot.x + 0.5}
+              y={spot.y + 0.5}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fontSize={0.3}
+              fontWeight={600}
+              fill="#f8fafc"
+              stroke="#0f172a"
+              strokeWidth={0.04}
+              paintOrder="stroke"
+              pointerEvents="none"
+            >
+              {locationName(locale, spot.id)}
+            </text>
+          ))}
         </svg>
 
-        {running && (
-          <div className="pointer-events-none absolute left-2 top-2 z-10 max-w-xs rounded-lg border border-cyan-500/40 bg-slate-950/90 px-3 py-2 shadow-lg backdrop-blur-sm">
-            <p className="text-xs font-semibold uppercase tracking-wider text-cyan-400">
-              {taskLabel}
+        {/* Mission context card — persistent during simulation */}
+        {running && task && (
+          <div className="pointer-events-none absolute left-2 top-2 z-10 max-w-[55%] rounded-lg border border-cyan-700/60 bg-slate-900/90 px-3 py-2 text-xs backdrop-blur-sm">
+            <p className="font-bold text-cyan-300">{goalName}</p>
+            <p className="mt-0.5 text-[10px] text-slate-400">
+              {startName} → {goalName}
             </p>
-            <p className="mt-0.5 text-sm font-medium text-white">
-              {translate(locale, "simulator.missionRoute", {
-                from: startName,
-                to: goalName,
-              })}
-            </p>
-            <div className="mt-1.5 flex flex-wrap items-center gap-2">
-              <span className="rounded-md bg-cyan-600 px-2.5 py-1 text-sm font-bold text-white">
-                {translate(locale, "simulator.missionStep", {
-                  step: robot.completedSteps,
-                  total: totalSteps,
-                })}
-              </span>
-              <span className="text-sm text-cyan-100/90">
-                {translate(locale, `robotStatus.${robot.status}`)}
-              </span>
-            </div>
+            {robot.status === "replanning" && (
+              <p className="mt-1 animate-pulse font-semibold text-orange-400">
+                ⚠ Re-planning route…
+              </p>
+            )}
           </div>
         )}
 
-        <div className="pointer-events-none absolute bottom-2 left-2 right-2 z-10 max-h-[4.5rem] overflow-hidden">
-          <FloorPlanLegend />
+        <div className="pointer-events-none absolute bottom-1 left-2 right-2 flex items-end justify-between gap-2">
+          <p className="max-w-[70%] text-[10px] leading-snug text-slate-600">
+            {t("simulator.mapModeTitle")}
+            <span className="mx-1">·</span>
+            {t("simulator.mapAttribution")}
+          </p>
+          {running && (
+            <div className="rounded bg-slate-800/85 px-2 py-0.5 text-[11px] font-medium text-white">
+              {translate(locale, "simulator.missionStep", {
+                step: robot.completedSteps,
+                total: totalSteps,
+              })}
+            </div>
+          )}
+        </div>
         </div>
       </div>
     </div>
   );
-}
-
-function statusTone(
-  robot: RobotState,
-  planningPhase: boolean,
-  running: boolean
-): string {
-  if (robot.status === "completed")
-    return "border-lime-500/60 bg-lime-950/50 text-lime-200";
-  if (robot.status === "failed" || robot.status === "blocked")
-    return "border-red-500/60 bg-red-950/50 text-red-200";
-  if (planningPhase || robot.status === "planning")
-    return "border-amber-500/60 bg-amber-950/50 text-amber-200";
-  if (robot.status === "replanning")
-    return "border-orange-500/60 bg-orange-950/50 text-orange-200";
-  if (running) return "border-cyan-500/60 bg-cyan-950/50 text-cyan-100";
-  return "border-slate-700 bg-slate-900/80 text-slate-400";
 }
 
 function getStatusText(

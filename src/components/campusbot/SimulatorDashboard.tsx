@@ -9,6 +9,7 @@ import { MapFloorPlanView } from "./MapFloorPlanView";
 import { ControlPanel } from "./ControlPanel";
 import { DecisionLogPanel } from "./DecisionLogPanel";
 import { MissionBriefingPanel } from "./MissionBriefingPanel";
+import { AStarExplainPanel } from "./AStarExplainPanel";
 import { RobotSensorPanel } from "./RobotSensorPanel";
 import { NarrativeTimeline } from "./NarrativeTimeline";
 import { getScenarioById } from "@/lib/campusbot/scenarios";
@@ -40,7 +41,8 @@ export function SimulatorDashboard() {
       <CampusNav />
       <MetricsBar robot={sim.robot} metrics={sim.metrics} />
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden xl:flex-row">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
+        <div className="flex min-h-[min(58vh,560px)] min-w-0 flex-1 flex-col lg:min-h-0">
         <MapFloorPlanView
           map={sim.map}
           robot={sim.robot}
@@ -53,21 +55,30 @@ export function SimulatorDashboard() {
           running={sim.controls.running ?? false}
           presentationAct={sim.presentationAct}
           moveDurationMs={sim.moveDurationMs}
-          lastLogEntry={sim.decisionLog[sim.decisionLog.length - 1]}
           addObstacleMode={addObstacleMode}
+          onAdvanceFromIntro={sim.controls.stagedDemo ? sim.advanceFromIntro : undefined}
           onCellClick={(point) => {
             if (addObstacleMode) {
               sim.addObstacle(point);
             }
           }}
         />
+        </div>
 
-        <aside className="flex w-full min-h-0 shrink-0 flex-col gap-3 overflow-y-auto border-l border-cyan-900/40 bg-slate-900/40 p-4 text-[15px] xl:w-80">
+        <aside className="flex w-full min-h-0 shrink-0 flex-col gap-2 overflow-y-auto border-t border-cyan-900/40 bg-slate-900/40 p-3 text-sm lg:w-72 lg:border-l lg:border-t-0">
           {!sim.controls.running && (
             <MissionBriefingPanel
               scenario={sim.scenario}
               taskId={sim.controls.taskId}
               running={sim.controls.running}
+            />
+          )}
+          {sim.controls.running && sim.controls.planningPhase && (
+            <AStarExplainPanel
+              exploredCount={sim.exploredCells?.length ?? 0}
+              pathCells={sim.robot.currentPath.length}
+              planningPhase={sim.controls.planningPhase}
+              safetyMode={sim.controls.safetyMode}
             />
           )}
           <ControlPanel
