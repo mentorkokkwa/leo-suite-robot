@@ -21,6 +21,15 @@ Open `/campusbot` on the dev server (default port **3002**).
 
 No API keys or environment variables required — fully client-side simulation.
 
+## Deployment
+
+| Item | Link |
+|------|------|
+| **Source** | [mentorkokkwa/leo-suite-robot](https://github.com/mentorkokkwa/leo-suite-robot) |
+| **Live demo** | https://leo-suite-robot.vercel.app/campusbot |
+| **Simulator** | https://leo-suite-robot.vercel.app/campusbot/simulator |
+| **Vercel** | [vercel.com/cenzhi/leo-suite-robot](https://vercel.com/cenzhi/leo-suite-robot) |
+
 ## Build
 
 ```bash
