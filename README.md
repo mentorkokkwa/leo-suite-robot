@@ -2,8 +2,6 @@
 
 School service robot navigation and task execution simulator.
 
-Part of the **Leo Suite** (YouthMentor · EduLens · CampusBot).
-
 ## Features
 
 - School map simulator with A* path planning
