@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { AlgorithmFlowDiagram } from "@/components/campusbot/AlgorithmFlowDiagram";
 import { CampusNav } from "@/components/campusbot/CampusNav";
+import { ScenarioMetricsTable } from "@/components/campusbot/ScenarioMetricsTable";
+import { SchoolReadySection } from "@/components/campusbot/SchoolReadySection";
 import { useLocale } from "@/contexts/LocaleContext";
 import { DEMO_SCENARIOS } from "@/lib/campusbot/scenarios";
 
@@ -97,6 +100,14 @@ export default function CampusBotHomePage() {
             ))}
           </div>
         </div>
+      </section>
+
+      <SchoolReadySection />
+
+      {/* ── Commercial evidence ───────────────────────────────────── */}
+      <section className="mx-auto max-w-4xl space-y-8 px-6 py-12">
+        <AlgorithmFlowDiagram />
+        <ScenarioMetricsTable />
       </section>
 
       {/* ── Demo Scenarios (primary CTA grid) ─────────────────────── */}

@@ -52,6 +52,58 @@ const en = {
     why3Desc:
       "Three real-world service missions with safety rules, restricted zones, and dynamic human obstacles — grounded in an actual Singapore secondary school campus.",
     openScenario: "Open in simulator →",
+    schoolReady: {
+      badge: "School-ready design",
+      title: "Why this is school-ready",
+      subtitle:
+        "Built for robotics CCA demos, computing coursework, and facilities planning — not a generic game.",
+      rows: {
+        problem: {
+          title: "Real user problem",
+          body:
+            "Schools explore service robots for worksheet delivery and visitor guidance, but lack a safe software sandbox before buying hardware.",
+        },
+        workflow: {
+          title: "Core workflow",
+          body:
+            "Pick scenario → A* plans route → step simulation with dynamic obstacles → re-plan if blocked → export metrics report for class debrief.",
+        },
+        safety: {
+          title: "Safety / privacy design",
+          body:
+            "Fully client-side simulation — no student data, no cloud accounts. Task safety rules and restricted zones mirror real campus policies.",
+        },
+        pilot: {
+          title: "Future school pilot plan",
+          body:
+            "Phase 1: robotics club uses simulator for A* lessons. Phase 2: map real wing layout. Phase 3: Arduino prototype on same task definitions.",
+        },
+      },
+    },
+    metricsCompare: {
+      title: "Scenario metrics comparison",
+      subtitle: "Benchmark runs on Fuhua campus map — comparable evidence for portfolio review.",
+      scenarioCol: "Scenario",
+      footnote: "Run live in simulator to reproduce. Values from completed demo runs.",
+    },
+    algorithmFlow: {
+      title: "Navigation algorithm flow",
+      subtitle: "From mission brief to measurable outcomes — every step visible in the decision log.",
+      replanLoop: "collision / blocked → re-plan",
+      steps: {
+        task: "Task goal",
+        map: "Grid map",
+        astar: "A* path",
+        sim: "Step sim",
+        replan: "Re-plan",
+        metrics: "Metrics",
+      },
+    },
+    benchmarkSummary: {
+      "worksheet-delivery": "2 students block corridor — 1 re-plan",
+      "visitor-guide": "Crowded corridor — 3 re-plans",
+      "library-return": "Narrow aisle + static obstacle",
+    },
   },
   maps: {
     title: "School Maps",
@@ -486,6 +538,53 @@ const zh = {
     why3Desc:
       "三个真实服务任务，含安全规则、禁区与动态人员障碍——以新加坡真实中学校园为原型构建。",
     openScenario: "在仿真器中打开 →",
+    schoolReady: {
+      badge: "适合学校落地",
+      title: "为什么适合学校使用",
+      subtitle: "面向机器人 CCA 演示、计算课程与后勤规划——不是普通游戏。",
+      rows: {
+        problem: {
+          title: "真实用户问题",
+          body: "学校想探索送作业、导访客等服务机器人，但采购硬件前缺少安全的软件试验环境。",
+        },
+        workflow: {
+          title: "核心流程",
+          body: "选择场景 → A* 规划路径 → 逐步仿真与动态障碍 → 受阻时重规划 → 导出指标报告供课堂复盘。",
+        },
+        safety: {
+          title: "安全 / 隐私设计",
+          body: "纯客户端仿真——无学生数据、无需账号。任务安全规则与禁区映射真实校园管理要求。",
+        },
+        pilot: {
+          title: "未来学校试点计划",
+          body: "阶段一：机器人 CCA 用仿真器教 A*。阶段二：录入真实楼层地图。阶段三：Arduino 原型对接同一任务定义。",
+        },
+      },
+    },
+    metricsCompare: {
+      title: "场景指标对比",
+      subtitle: "福华校园地图基准运行——作品集可核对的量化证据。",
+      scenarioCol: "场景",
+      footnote: "可在仿真器中复现。数值来自完整演示运行。",
+    },
+    algorithmFlow: {
+      title: "导航算法流程图",
+      subtitle: "从任务目标到可量化结果——决策日志中每一步可见。",
+      replanLoop: "碰撞 / 受阻 → 重规划",
+      steps: {
+        task: "任务目标",
+        map: "栅格地图",
+        astar: "A* 路径",
+        sim: "逐步仿真",
+        replan: "重规划",
+        metrics: "指标报告",
+      },
+    },
+    benchmarkSummary: {
+      "worksheet-delivery": "两名学生挡走廊——重规划 1 次",
+      "visitor-guide": "拥挤走廊——重规划 3 次",
+      "library-return": "窄通道 + 静态障碍",
+    },
   },
   maps: {
     title: "学校地图",
