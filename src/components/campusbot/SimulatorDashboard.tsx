@@ -37,11 +37,11 @@ export function SimulatorDashboard() {
   }, [searchParams]);
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-slate-950 text-slate-100">
+    <div className="flex min-h-[100dvh] flex-col bg-slate-950 text-slate-100 md:h-screen md:overflow-hidden">
       <CampusNav />
       <MetricsBar robot={sim.robot} metrics={sim.metrics} />
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto md:overflow-hidden lg:flex-row">
         <div className="flex min-h-[min(58vh,560px)] min-w-0 flex-1 flex-col lg:min-h-0">
         <MapFloorPlanView
           map={sim.map}

@@ -13,6 +13,7 @@ import {
   LOCALE_STORAGE_KEY,
   t as translate,
 } from "@/lib/i18n";
+import { readLocaleFromUrl } from "@/lib/i18n/locale-url";
 import type { Locale, MessageParams } from "@/lib/i18n/types";
 
 type LocaleContextValue = {
@@ -30,6 +31,12 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
 
   useEffect(() => {
+    const fromUrl = readLocaleFromUrl();
+    if (fromUrl) {
+      setLocaleState(fromUrl);
+      localStorage.setItem(LOCALE_STORAGE_KEY, fromUrl);
+      return;
+    }
     const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
     if (stored === "en" || stored === "zh") {
       setLocaleState(stored);

@@ -85,4 +85,4 @@ export function formatDecisionEntry(
 
 export const LOCALE_STORAGE_KEY = "campusbot-locale";
 
-export const DEFAULT_LOCALE: Locale = "zh";
+export const DEFAULT_LOCALE: Locale = "en";

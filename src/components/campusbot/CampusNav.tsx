@@ -22,8 +22,8 @@ export function CampusNav() {
   const { t } = useLocale();
 
   return (
-    <nav className="flex flex-wrap items-center gap-1 border-b border-cyan-900/50 bg-slate-950 px-4 py-2">
-      <span className="mr-4 font-mono text-sm font-bold tracking-wider text-cyan-400">
+    <nav className="flex flex-wrap items-center gap-1 border-b border-cyan-900/50 bg-slate-950 px-3 py-2 sm:px-4">
+      <span className="mr-2 w-full font-mono text-sm font-bold tracking-wider text-cyan-400 sm:mr-4 sm:w-auto">
         {t("brand")}
       </span>
       {LINKS.map((link) => {

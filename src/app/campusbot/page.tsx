@@ -52,7 +52,7 @@ export default function CampusBotHomePage() {
       <CampusNav />
 
       {/* ── Hero ──────────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-4xl px-6 pb-12 pt-14">
+      <section className="mx-auto max-w-4xl px-4 pb-12 pt-10 sm:px-6 sm:pt-14">
         <span className="inline-flex items-center gap-2 rounded-full border border-cyan-800 bg-cyan-950/50 px-3 py-1 text-xs font-semibold tracking-wider text-cyan-400">
           {t("home.badge")}
         </span>
