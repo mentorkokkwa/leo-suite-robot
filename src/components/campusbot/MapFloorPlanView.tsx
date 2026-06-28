@@ -678,21 +678,16 @@ export function MapFloorPlanView({
           </div>
         )}
 
-        <div className="pointer-events-none absolute bottom-1 left-2 right-2 flex items-end justify-between gap-2">
-          <p className="max-w-[70%] text-[10px] leading-snug text-slate-600">
-            {t("simulator.mapModeTitle")}
-            <span className="mx-1">·</span>
-            {t("simulator.mapAttribution")}
-          </p>
-          {running && (
+        {running && (
+          <div className="pointer-events-none absolute bottom-1 right-2">
             <div className="rounded bg-slate-800/85 px-2 py-0.5 text-[11px] font-medium text-white">
               {translate(locale, "simulator.missionStep", {
                 step: robot.completedSteps,
                 total: totalSteps,
               })}
             </div>
-          )}
-        </div>
+          </div>
+        )}
         </div>
       </div>
     </div>
