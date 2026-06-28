@@ -108,17 +108,16 @@ export function SimulatorDashboard() {
             active={sensorActive}
           />
           <NarrativeTimeline events={sim.narrativeEvents} />
+          <DecisionLogPanel
+            entries={sim.decisionLog}
+            showReportLink={
+              sim.robot.status === "completed" ||
+              sim.robot.status === "failed" ||
+              sim.robot.status === "blocked"
+            }
+          />
         </aside>
       </div>
-
-      <DecisionLogPanel
-        entries={sim.decisionLog}
-        showReportLink={
-          sim.robot.status === "completed" ||
-          sim.robot.status === "failed" ||
-          sim.robot.status === "blocked"
-        }
-      />
     </div>
   );
 }

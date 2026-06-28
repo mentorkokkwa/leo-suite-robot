@@ -248,27 +248,58 @@ export function ControlPanel({
         {t("simulator.safetyMode")}
       </label>
 
+      {/* ── Interactive experiment section ── */}
+      <div className="rounded-lg border border-amber-600/50 bg-amber-950/20 p-2.5">
+        <p className="text-[10px] font-bold uppercase tracking-wider text-amber-400">
+          🎮 {t("simulator.experimentTitle")}
+        </p>
+        {!isRunning && (
+          <ol className="mt-1.5 space-y-0.5 pl-1 text-[10px] leading-relaxed text-amber-200/80">
+            <li>1. {t("simulator.experimentStep1")}</li>
+            <li>2. {t("simulator.experimentStep2")}</li>
+            <li>3. {t("simulator.experimentStep3")}</li>
+          </ol>
+        )}
+        {isRunning && (
+          <p className="mt-1 text-[10px] leading-relaxed text-amber-200/80">
+            {t("simulator.experimentRunningHint")}
+          </p>
+        )}
+      </div>
+
       <button
         type="button"
         onClick={onToggleAddObstacle}
-        className={`rounded border px-3 py-2 text-xs font-semibold ${
+        className={`flex w-full items-center justify-center gap-2 rounded-lg border-2 px-3 py-2.5 text-sm font-bold transition-all ${
           addObstacleMode
-            ? "border-amber-500 bg-amber-900/40 text-amber-300"
-            : "border-slate-600 text-slate-400 hover:bg-slate-800"
+            ? "animate-pulse border-amber-400 bg-amber-900/50 text-amber-200 shadow-lg shadow-amber-900/40"
+            : "border-amber-700/60 bg-amber-950/30 text-amber-300 hover:border-amber-500 hover:bg-amber-900/30"
         }`}
       >
+        🧱{" "}
         {addObstacleMode
           ? t("simulator.addObstacleActive")
           : t("simulator.addObstacle")}
+        {controls.userObstacles.length > 0 && (
+          <span className="ml-auto rounded-full bg-amber-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+            {controls.userObstacles.length}
+          </span>
+        )}
       </button>
+
+      {addObstacleMode && (
+        <p className="rounded border border-amber-700/40 bg-amber-950/30 px-2 py-1.5 text-center text-xs font-semibold text-amber-100">
+          👆 {t("simulator.addObstacleActive")}
+        </p>
+      )}
 
       {!isRunning && (
         <button
           type="button"
           onClick={onRunExperiment}
-          className="rounded border border-cyan-700 bg-cyan-950/50 px-3 py-2.5 text-sm font-semibold text-cyan-300 hover:bg-cyan-900/30"
+          className="w-full rounded-lg border-2 border-cyan-600 bg-cyan-950/50 px-3 py-2.5 text-sm font-bold text-cyan-200 hover:bg-cyan-900/30 hover:border-cyan-400"
         >
-          {t("simulator.runExperiment")}
+          ▶ {t("simulator.runExperiment")}
         </button>
       )}
     </div>

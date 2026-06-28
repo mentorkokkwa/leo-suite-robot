@@ -280,6 +280,11 @@ const en = {
     runningRoute: "Route",
     introAdvance: "▶ Begin A* planning",
     introAdvanceHint: "Campus overview ready — click to start path planning.",
+    experimentTitle: "Interactive Experiment",
+    experimentStep1: "Click 🧱 Place Obstacle, then click cells on the map",
+    experimentStep2: "Add as many obstacles as you like",
+    experimentStep3: "Click ▶ Run Experiment — watch the robot find a new path!",
+    experimentRunningHint: "Click 🧱 Place Obstacle to add new obstacles while running — robot will replan in real time!",
   },
   narrative: {
     pathPlannedTitle: "Route planned",
@@ -757,6 +762,11 @@ const zh = {
     runningRoute: "路线",
     introAdvance: "▶ 开始 A* 规划",
     introAdvanceHint: "校园概览已就绪——点击开始路径规划。",
+    experimentTitle: "互动实验",
+    experimentStep1: "点击 🧱 放置障碍物，再点击地图格子",
+    experimentStep2: "可以放置任意数量的障碍物",
+    experimentStep3: "点击 ▶ 运行实验——看机器人规划新路线！",
+    experimentRunningHint: "点击 🧱 放置障碍物，机器人会实时重新规划路线！",
   },
   narrative: {
     pathPlannedTitle: "路线已规划",

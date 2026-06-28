@@ -76,13 +76,14 @@ export const DEMO_SCENARIOS: SimulationScenario[] = [
       {
         id: "student-2",
         labelKey: "student",
-        position: { x: 8, y: 14 },
+        /** Patrol between corridor cells — (8,14) is a wall tile, safe range starts at (9,14). */
+        position: { x: 9, y: 14 },
         path: [
-          { x: 8, y: 14 },
           { x: 9, y: 14 },
           { x: 10, y: 14 },
+          { x: 11, y: 14 },
+          { x: 10, y: 14 },
           { x: 9, y: 14 },
-          { x: 8, y: 14 },
         ],
         pathIndex: 0,
       },

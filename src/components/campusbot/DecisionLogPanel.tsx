@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useLocale } from "@/contexts/LocaleContext";
 import { formatDecisionEntry } from "@/lib/i18n";
 import type { DecisionLogEntry } from "@/lib/campusbot/types";
@@ -11,7 +11,8 @@ type DecisionLogPanelProps = {
 };
 
 /**
- * Bottom decision log showing robot reasoning per step.
+ * Decision log showing robot reasoning per step.
+ * Designed to be placed inside the scrollable right sidebar.
  */
 export function DecisionLogPanel({
   entries,
@@ -29,19 +30,11 @@ export function DecisionLogPanel({
     }
   }, [entries.length, latestTimestamp]);
 
-  const [expanded, setExpanded] = useState(false);
-  const panelHeight = expanded ? "h-48" : "h-28";
-
   return (
-    <div className={`flex ${panelHeight} shrink-0 flex-col border-t border-cyan-900/40 bg-slate-950 transition-all duration-200`}>
-      <div className="flex items-center justify-between px-3 py-1.5">
-        <button
-          type="button"
-          onClick={() => setExpanded((v) => !v)}
-          className="flex items-center gap-2 text-left"
-          aria-expanded={expanded}
-        >
-          <span className="text-sm font-semibold uppercase tracking-wide text-cyan-500">
+    <section className="rounded-lg border border-cyan-900/40 bg-slate-900/40">
+      <div className="flex items-center justify-between px-3 py-2">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold uppercase tracking-wider text-cyan-400">
             {t("simulator.decisionLog")}
           </span>
           {entries.length > 0 && (
@@ -49,10 +42,7 @@ export function DecisionLogPanel({
               {entries.length}
             </span>
           )}
-          <span className="text-[10px] text-slate-500">
-            {expanded ? "▲" : "▼"}
-          </span>
-        </button>
+        </div>
         {showReportLink && (
           <a
             href="/campusbot/report"
@@ -62,9 +52,9 @@ export function DecisionLogPanel({
           </a>
         )}
       </div>
-      <div className="flex-1 overflow-y-auto px-3 pb-2 font-mono text-xs">
+      <div className="max-h-52 overflow-y-auto border-t border-cyan-900/30 px-3 py-2 font-mono text-xs">
         {display.length === 0 ? (
-          <p className="text-slate-500">{t("simulator.noDecisions")}</p>
+          <p className="text-slate-400">{t("simulator.noDecisions")}</p>
         ) : (
           <ul ref={listRef} className="space-y-1">
             {display.map((e, i) => {
@@ -73,14 +63,14 @@ export function DecisionLogPanel({
               return (
                 <li
                   key={`${e.timestamp}-${i}`}
-                  className={`rounded px-1.5 py-1 text-slate-300 ${
+                  className={`rounded px-1.5 py-1 ${
                     isLatest
-                      ? "bg-cyan-950/70 ring-1 ring-cyan-700/60"
-                      : "opacity-70"
+                      ? "bg-cyan-950/70 text-white ring-1 ring-cyan-700/60"
+                      : "text-slate-200 opacity-80"
                   }`}
                 >
-                  <span className="font-bold text-cyan-500">[{actionLabel}]</span>{" "}
-                  <span className="text-slate-500">({e.robotPosition.x},{e.robotPosition.y})</span>{" "}
+                  <span className="font-bold text-cyan-400">[{actionLabel}]</span>{" "}
+                  <span className="text-slate-400">({e.robotPosition.x},{e.robotPosition.y})</span>{" "}
                   {reason}
                 </li>
               );
@@ -88,6 +78,6 @@ export function DecisionLogPanel({
           </ul>
         )}
       </div>
-    </div>
+    </section>
   );
 }
