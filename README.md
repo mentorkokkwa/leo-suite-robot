@@ -24,8 +24,8 @@ No API keys or environment variables required — fully client-side simulation.
 | Item | Link |
 |------|------|
 | **Source** | [mentorkokkwa/leo-suite-robot](https://github.com/mentorkokkwa/leo-suite-robot) |
-| **Live demo** | https://leo-suite-robot.vercel.app/campusbot |
-| **Simulator** | https://leo-suite-robot.vercel.app/campusbot/simulator |
+| **Live demo** | https://leo-suite-robot.vercel.app/campusbot?locale=en |
+| **Simulator** | https://leo-suite-robot.vercel.app/campusbot/simulator?locale=en |
 | **Vercel** | [vercel.com/cenzhi/leo-suite-robot](https://vercel.com/cenzhi/leo-suite-robot) |
 
 ## Build
